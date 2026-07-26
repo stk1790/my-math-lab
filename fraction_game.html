@@ -17,7 +17,7 @@
         button { width: 100%; padding: 0.85rem; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:hover { background: #1d4ed8; }
 
-        /* 모드 선택 버튼들 */
+        /* 모드 선택 및 랭킹 탭 버튼들 */
         .mode-grid { display: grid; gap: 0.75rem; margin-top: 1rem; }
         .mode-btn { background: #f8fafc; color: #1e293b; border: 2px solid #e2e8f0; text-align: left; padding: 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
         .mode-btn:hover { border-color: #2563eb; background: #eff6ff; }
@@ -30,11 +30,17 @@
         .timer-container { width: 100%; background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 1.5rem; }
         .timer-bar { height: 100%; background: #2563eb; width: 100%; transition: width 0.1s linear, background-color 0.3s; }
 
-        /* 분수 수식 표기 */
-        .equation-box { display: flex; justify-content: center; align-items: center; gap: 1rem; font-size: 1.8rem; font-weight: bold; margin: 1.5rem 0; min-height: 80px; }
+        /* 분수 수식 표기 (기본 게임 화면용 - 검은색 분수선) */
+        .equation-box { display: flex; justify-content: center; align-items: center; gap: 1rem; font-size: 1.8rem; font-weight: bold; margin: 1.5rem 0; min-height: 80px; color: #334155; }
         .fraction { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; }
         .fraction .num { border-bottom: 3px solid #334155; padding: 0 4px; }
         .fraction .den { padding: 0 4px; }
+
+        /* 모달 팝업용 수식 표기 (흰색 분수선 및 흰색 글씨) */
+        .modal-equation-box { color: #ffffff !important; }
+        .modal-equation-box .fraction .num { border-bottom: 3px solid #ffffff !important; color: #ffffff !important; }
+        .modal-equation-box .fraction .den { color: #ffffff !important; }
+        .modal-equation-box span { color: #ffffff !important; }
 
         /* 답 입력 칸 (분자/분모) */
         .answer-box { display: flex; flex-direction: column; align-items: center; width: 100px; margin: 0 auto 1.5rem; }
@@ -45,25 +51,54 @@
         .alert-msg { color: #ef4444; font-size: 0.85rem; font-weight: bold; min-height: 1.2rem; margin-bottom: 0.5rem; }
 
         /* 모달 팝업 (해설 및 정답) */
-        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 2rem; z-index: 10; backdrop-filter: blur(4px); }
+        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.92); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 2rem; z-index: 10; backdrop-filter: blur(4px); }
         .modal h2 { color: #f87171; margin-bottom: 0.5rem; font-size: 1.5rem; }
-        .modal p { margin-bottom: 1rem; font-size: 1.1rem; }
+        .modal p { margin-bottom: 1rem; font-size: 1.1rem; color: #f1f5f9; }
         .modal button { background: #10b981; max-width: 200px; }
         .modal button:hover { background: #059669; }
-        
+
+        /* 명예의 전당 스타일 */
+        .hall-of-fame { margin-top: 2rem; padding-top: 1.5rem; border-top: 2px dashed #e2e8f0; text-align: left; }
+        .hall-of-fame h2 { font-size: 1.1rem; color: #1e3a8a; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .rank-tabs { display: flex; gap: 4px; margin-bottom: 0.75rem; overflow-x: auto; padding-bottom: 4px; }
+        .rank-tab { padding: 0.4rem 0.6rem; font-size: 0.8rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; white-space: nowrap; font-weight: 600; color: #64748b; }
+        .rank-tab.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .rank-list { background: #f8fafc; border-radius: 8px; padding: 0.75rem; max-height: 160px; overflow-y: auto; font-size: 0.85rem; border: 1px solid #e2e8f0; }
+        .rank-item { display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid #f1f5f9; }
+        .rank-item:last-child { border-bottom: none; }
+        .rank-no { font-weight: bold; width: 24px; color: #2563eb; }
+        .rank-name { flex-grow: 1; text-align: left; font-weight: 500; }
+        .rank-score { font-weight: bold; color: #059669; }
+
         .home-link { display: inline-block; margin-top: 1rem; color: #64748b; text-decoration: none; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <!-- 1. 학번 입력 화면 -->
+        <!-- 1. 학번 입력 및 명예의 전당 화면 -->
         <div id="screen-auth">
             <h1>🧪 분수 연산 마스터</h1>
             <p style="margin-bottom: 1.5rem; color: #64748b;">학번 4자리를 입력하고 입장하세요.</p>
             <input type="text" id="student-id" placeholder="예: 1101" maxlength="4">
             <div id="auth-alert" class="alert-msg"></div>
             <button onclick="checkAuth()">입장하기</button>
+
+            <!-- 명예의 전당 섹션 -->
+            <div class="hall-of-fame">
+                <h2>🏆 명예의 전당</h2>
+                <div class="rank-tabs">
+                    <button class="rank-tab active" onclick="showRankTab('덧셈')">덧셈</button>
+                    <button class="rank-tab" onclick="showRankTab('뺄셈')">뺄셈</button>
+                    <button class="rank-tab" onclick="showRankTab('곱셈')">곱셈</button>
+                    <button class="rank-tab" onclick="showRankTab('나눗셈')">나눗셈</button>
+                    <button class="rank-tab" onclick="showRankTab('랜덤')">랜덤</button>
+                </div>
+                <div id="rank-list-container" class="rank-list">
+                    <!-- 자바스크립트로 랭킹 목록 삽입 -->
+                </div>
+            </div>
+
             <a href="index.html" class="home-link">← 메인 화면으로 돌아가기</a>
         </div>
 
@@ -104,11 +139,11 @@
             <button onclick="submitAnswer()">정답 제출</button>
         </div>
 
-        <!-- 4. 해설 모달 (틀렸거나 정수/약분 오류 시) -->
+        <!-- 4. 해설 모달 (흰색 분수선 지원) -->
         <div id="modal-explain" class="modal hidden">
             <h2 id="modal-title">아쉬워요!</h2>
             <p id="modal-msg">정답은 다음과 같습니다.</p>
-            <div id="modal-answer-box" class="equation-box" style="margin: 1rem 0;"></div>
+            <div id="modal-answer-box" class="equation-box modal-equation-box" style="margin: 1rem 0;"></div>
             <button onclick="closeModal()">확인했어요</button>
         </div>
 
@@ -121,9 +156,10 @@
     </div>
 
     <script>
-        // 사전 등록 학번 명단 (필요 시 수정 및 추가)
+        // 사전 등록 학번 명단
         const studentList = {
-            "1101": "강민경", "1102": "김서진", "1103": "문지호", "1104": "박은성", "1105": "윤희진", "1106": "이나리", "1107": "이지연", "1108": "이지영", "1109": "조예은", "1110": "조윤아", "1111": "진현정", "1112": "윤규빈", "1113": "최나예", "1114": "김현수", "1115": "김예준", "1116": "김윤재", "1117": "민동원", "1118": "민지홍", "1119": "박채성", "1120": "박태환", "1121": "이민재", "1122": "이찬서", "1123": "이태연", "1124": "정지욱", "1125": "정하준", "1126": "한준혁", "1127": "홍승표", "1201": "김수아", "1202": "김라원", "1203": "박미진", "1204": "박은진", "1205": "백지우", "1206": "윤서빈", "1207": "윤지아", "1208": "이하율", "1209": "이하은", "1210": "최예슬", "1211": "하다희", "1212": "허지윤", "1213": "강서흔", "1214": "김도흔", "1215": "김태경", "1216": "김태균", "1217": "김태연", "1218": "박여민", "1219": "박준우", "1220": "엄지우", "1221": "오재윤", "1222": "윤현준", "1223": "이민우", "1224": "장유비", "1225": "전재영", "1226": "최연우", "1301": "김다인", "1302": "김승아", "1303": "김윤서", "1304": "김해미", "1305": "김희주", "1306": "박결", "1307": "박나린", "1308": "박서윤", "1309": "박수빈", "1310": "박유정", "1311": "신초은", "1312": "임수영", "1313": "정하윤", "1314": "김건희", "1315": "김동욱", "1316": "김무궁", "1317": "김세훈", "1318": "박예준", "1319": "박제이", "1320": "송하준", "1321": "안시우", "1322": "유서준", "1323": "윤태균", "1324": "이정우", "1325": "이태연", "1326": "정찬영", "1327": "민승기", "1401": "나세나", "1402": "민서연", "1403": "오윤서", "1404": "위지효", "1405": "유윤영", "1406": "이가현", "1407": "임수라", "1408": "임하율", "1409": "장윤위", "1410": "장혜율", "1411": "천지윤", "1412": "최소율", "1413": "최정은", "1414": "김가온", "1415": "김승민", "1416": "김영중", "1417": "김태현", "1418": "나윤준", "1419": "박규영", "1420": "박시우", "1421": "박지호", "1422": "신무준", "1423": "윤찬진", "1424": "이준서", "1425": "정석원", "1426": "한지한", "1427": "정성희", "1501": "강민영", "1502": "김단비", "1503": "김미솔", "1504": "김수연", "1505": "김은서", "1506": "박신해", "1507": "박채연", "1508": "박혜빈", "1509": "윤예서", "1510": "이지후", "1511": "임가온", "1512": "임수아", "1513": "전혜원", "1514": "강성원", "1515": "김민재", "1516": "김성윤", "1517": "김장현", "1518": "김현준", "1519": "박연성", "1520": "박용우", "1521": "박태윤", "1522": "신준범", "1523": "이기쁨", "1524": "이승혁", "1525": "전세인", "1526": "허진호"
+            "1101": "홍길동", "1102": "김철수", "1103": "이영희",
+            "1104": "박민수", "1105": "최지우"
         };
 
         let currentUser = { id: "", name: "" };
@@ -134,11 +170,17 @@
         let timeLeft = 15;
         let timerInterval = null;
         let currentProblem = {};
+        let currentRankTab = "덧셈";
 
         // 최대공약수 (약분 판별용)
         function gcd(a, b) {
             return b === 0 ? Math.abs(a) : gcd(b, a % b);
         }
+
+        // 초기화 시 랭킹 로드
+        window.onload = function() {
+            renderRanking("덧셈");
+        };
 
         // 1. 학번 인증
         function checkAuth() {
@@ -158,7 +200,68 @@
             }
         }
 
-        // 2. 게임 시작
+        // 2. 명예의 전당 랭킹 불러오기 및 렌더링
+        function showRankTab(mode) {
+            currentRankTab = mode;
+            const tabs = document.querySelectorAll(".rank-tab");
+            tabs.forEach(tab => {
+                if(tab.innerText === mode) tab.classList.add("active");
+                else tab.classList.remove("active");
+            });
+            renderRanking(mode);
+        }
+
+        function renderRanking(mode) {
+            const container = document.getElementById("rank-list-container");
+            const rawData = localStorage.getItem(`math_ranks_${mode}`);
+            const ranks = rawData ? JSON.parse(rawData) : [];
+
+            if (ranks.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:1rem 0;">아직 등록된 기록이 없습니다.</div>`;
+                return;
+            }
+
+            // 높은 단계, 높은 스테이지 순 정렬
+            ranks.sort((a, b) => (b.level * 10 + b.stage) - (a.level * 10 + a.stage));
+
+            let html = "";
+            ranks.slice(0, 10).forEach((item, index) => {
+                html += `
+                    <div class="rank-item">
+                        <span class="rank-no">${index + 1}</span>
+                        <span class="rank-name">${item.id} ${item.name}</span>
+                        <span class="rank-score">${item.level}단계 ${item.stage}스테이지</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // 랭킹 점수 기록 저장 함수
+        function saveScore() {
+            if (!currentUser.id) return;
+            const key = `math_ranks_${currentMode}`;
+            const rawData = localStorage.getItem(key);
+            let ranks = rawData ? JSON.parse(rawData) : [];
+
+            // 기존 동일 학번 기록 확인 및 최고 기록 업데이트
+            const existingIndex = ranks.findIndex(r => r.id === currentUser.id);
+            const newScoreValue = level * 10 + stage;
+
+            if (existingIndex !== -1) {
+                const oldScoreValue = ranks[existingIndex].level * 10 + ranks[existingIndex].stage;
+                if (newScoreValue > oldScoreValue) {
+                    ranks[existingIndex].level = level;
+                    ranks[existingIndex].stage = stage;
+                }
+            } else {
+                ranks.push({ id: currentUser.id, name: currentUser.name, level: level, stage: stage });
+            }
+
+            localStorage.setItem(key, JSON.stringify(ranks));
+        }
+
+        // 3. 게임 시작
         function startGame(mode) {
             currentMode = mode;
             level = 1; stage = 1; lives = 3;
@@ -169,16 +272,15 @@
             nextQuestion();
         }
 
-        // 3. 난수 생성 및 문제 출제
+        // 4. 난수 생성 및 문제 출제
         function generateProblem() {
-            const range = level * 5; // 분모/분자 범위 (단계 x 5)
+            const range = level * 5;
             let op = currentMode;
             if (op === '랜덤') {
                 const ops = ['덧셈', '뺄셈', '곱셈', '나눗셈'];
                 op = ops[Math.floor(Math.random() * ops.length)];
             }
 
-            // 분수 생성 함수
             function getRandomFrac() {
                 let den = Math.floor(Math.random() * range) + 1;
                 let num = Math.floor(Math.random() * range) + 1;
@@ -188,20 +290,17 @@
             let f1 = getRandomFrac();
             let f2 = getRandomFrac();
 
-            // 2단계부터 정수 등장 가능 (확률 30%)
             let isInt1 = (level >= 2 && Math.random() < 0.3);
             let isInt2 = (level >= 2 && Math.random() < 0.3);
             if (isInt1) f1 = { num: Math.floor(Math.random() * level) + 1, den: 1 };
             if (isInt2) f2 = { num: Math.floor(Math.random() * level) + 1, den: 1 };
 
-            // 뺄셈 시 음수 방지 (f1 > f2 유지)
             if (op === '뺄셈') {
                 if ((f1.num / f1.den) < (f2.num / f2.den)) {
                     let temp = f1; f1 = f2; f2 = temp;
                 }
             }
 
-            // 정답 정밀 계산 (분수 연산)
             let resNum, resDen;
             if (op === '덧셈') {
                 resNum = f1.num * f2.den + f2.num * f1.den;
@@ -224,13 +323,12 @@
             return { f1, f2, op, targetNum, targetDen };
         }
 
-        // 수식 HTML 생성기
         function renderFracHTML(f) {
-            if (f.den === 1) return `<span>${f.num}</span>`; // 정수인 경우
+            if (f.den === 1) return `<span>${f.num}</span>`;
             return `<div class="fraction"><span class="num">${f.num}</span><span class="den">${f.den}</span></div>`;
         }
 
-        // 4. 다음 문제 진행
+        // 5. 다음 문제 진행
         function nextQuestion() {
             if (lives <= 0) return;
             
@@ -238,13 +336,11 @@
             document.getElementById("ans-den").value = "";
             document.getElementById("game-alert").innerText = "";
             
-            // 상태 업데이트
             document.getElementById("stage-info").innerText = `${level}단계 (${stage}/3)`;
             document.getElementById("lives-display").innerText = "❤️".repeat(lives) + "🖤".repeat(3 - lives);
 
             currentProblem = generateProblem();
 
-            // 수식 화면에 출력
             let opSymbol = { '덧셈': '+', '뺄셈': '-', '곱셈': '×', '나눗셈': '÷' }[currentProblem.op];
             document.getElementById("equation-display").innerHTML = `
                 ${renderFracHTML(currentProblem.f1)}
@@ -256,7 +352,7 @@
             startTimer();
         }
 
-        // 5. 타이머 동작
+        // 6. 타이머 동작
         function startTimer() {
             clearInterval(timerInterval);
             timeLeft = 15;
@@ -280,7 +376,7 @@
             bar.style.backgroundColor = percentage < 30 ? "#ef4444" : "#2563eb";
         }
 
-        // 6. 정답 제출 검사
+        // 7. 정답 제출 검사
         function submitAnswer() {
             const userNum = parseInt(document.getElementById("ans-num").value);
             const userDen = parseInt(document.getElementById("ans-den").value);
@@ -295,7 +391,6 @@
                 return;
             }
 
-            // 약분 여부 체크 (최대공약수가 1이 아니면 약분 안 됨)
             if (gcd(userNum, userDen) !== 1) {
                 alertEl.innerText = "⚠️ 약분하지 않았습니다! 기약분수로 입력해 주세요.";
                 return;
@@ -303,9 +398,10 @@
 
             clearInterval(timerInterval);
 
-            // 정답 검사
             if (userNum === currentProblem.targetNum && userDen === currentProblem.targetDen) {
-                // 정답!
+                // 성공 기록 저장
+                saveScore();
+
                 stage++;
                 if (stage > 3) {
                     stage = 1;
@@ -313,7 +409,6 @@
                 }
 
                 if (level > 10) {
-                    // 10단계 클리어 엔딩!
                     document.getElementById("screen-game").classList.add("hidden");
                     document.getElementById("screen-ending").classList.remove("hidden");
                     document.getElementById("ending-msg").innerText = 
@@ -326,15 +421,15 @@
             }
         }
 
-        // 7. 실패(오답/시간초과) 처리
+        // 8. 실패(오답/시간초과) 처리
         function handleFail(reason) {
+            saveScore(); // 현재까지 성공한 기록 저장
             lives--;
             document.getElementById("lives-display").innerText = "❤️".repeat(lives) + "🖤".repeat(3 - lives);
 
             document.getElementById("modal-title").innerText = reason;
             document.getElementById("modal-msg").innerText = "정답은 다음과 같습니다:";
             
-            // 정답 수식 모달에 출력
             let ansHTML = renderFracHTML({ num: currentProblem.targetNum, den: currentProblem.targetDen });
             document.getElementById("modal-answer-box").innerHTML = ansHTML;
 
