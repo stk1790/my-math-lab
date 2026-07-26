@@ -244,7 +244,6 @@
             const rawData = localStorage.getItem(key);
             let ranks = rawData ? JSON.parse(rawData) : [];
 
-            // 기존 동일 학번 기록 확인 및 최고 기록 업데이트
             const existingIndex = ranks.findIndex(r => r.id === currentUser.id);
             const newScoreValue = level * 10 + stage;
 
@@ -272,35 +271,46 @@
             nextQuestion();
         }
 
-        // 4. 난수 생성 및 문제 출제
+        // 4. 난수 생성 및 문제 출제 (범위 증가 폭 1로 조정 반영)
         function generateProblem() {
-            const range = level * 5;
+            // N단계일 때 범위: 1 ~ (N + 4) (1단계는 1~5, 2단계는 1~6...)
+            const range = level + 4; 
+            
             let op = currentMode;
             if (op === '랜덤') {
                 const ops = ['덧셈', '뺄셈', '곱셈', '나눗셈'];
                 op = ops[Math.floor(Math.random() * ops.length)];
             }
 
+            // 기약분수 생성 함수 (분모는 2 이상으로 설정하여 기본적으로 분수 형태 보장)
             function getRandomFrac() {
-                let den = Math.floor(Math.random() * range) + 1;
-                let num = Math.floor(Math.random() * range) + 1;
-                return { num, den };
+                let den = Math.floor(Math.random() * (range - 1)) + 2; // 분모: 2 ~ range
+                let num = Math.floor(Math.random() * range) + 1;       // 분자: 1 ~ range
+                let g = gcd(num, den);
+                return { num: num / g, den: den / g };
             }
 
             let f1 = getRandomFrac();
             let f2 = getRandomFrac();
 
-            let isInt1 = (level >= 2 && Math.random() < 0.3);
-            let isInt2 = (level >= 2 && Math.random() < 0.3);
-            if (isInt1) f1 = { num: Math.floor(Math.random() * level) + 1, den: 1 };
-            if (isInt2) f2 = { num: Math.floor(Math.random() * level) + 1, den: 1 };
+            // 2단계부터 정수 등장 가능 (확률 30%, 둘 중 '하나만' 정수로 변환)
+            if (level >= 2 && Math.random() < 0.3) {
+                let intVal = Math.floor(Math.random() * level) + 1; // 정수 범위: 1 ~ level
+                if (Math.random() < 0.5) {
+                    f1 = { num: intVal, den: 1 };
+                } else {
+                    f2 = { num: intVal, den: 1 };
+                }
+            }
 
+            // 뺄셈 시 음수 방지 (f1 > f2 유지)
             if (op === '뺄셈') {
                 if ((f1.num / f1.den) < (f2.num / f2.den)) {
                     let temp = f1; f1 = f2; f2 = temp;
                 }
             }
 
+            // 정답 정밀 계산
             let resNum, resDen;
             if (op === '덧셈') {
                 resNum = f1.num * f2.den + f2.num * f1.den;
@@ -399,7 +409,6 @@
             clearInterval(timerInterval);
 
             if (userNum === currentProblem.targetNum && userDen === currentProblem.targetDen) {
-                // 성공 기록 저장
                 saveScore();
 
                 stage++;
@@ -423,7 +432,7 @@
 
         // 8. 실패(오답/시간초과) 처리
         function handleFail(reason) {
-            saveScore(); // 현재까지 성공한 기록 저장
+            saveScore();
             lives--;
             document.getElementById("lives-display").innerText = "❤️".repeat(lives) + "🖤".repeat(3 - lives);
 
