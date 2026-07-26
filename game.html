@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>좌표평면 연습하기</title>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; text-align: center; background: #f8fafc; padding: 2rem; color: #334155; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { font-size: 1.5rem; color: #2563eb; margin-bottom: 1rem; }
+        .target { font-size: 1.25rem; font-weight: bold; margin: 1.5rem 0; color: #0f172a; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+        button { padding: 1rem; font-size: 1rem; border: 1px solid #cbd5e1; background: #f1f5f9; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #e2e8f0; }
+        .back-btn { display: inline-block; margin-top: 1rem; color: #64748b; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 좌표평면 찾기 미니게임</h1>
+        <p>제시된 좌표에 해당하는 버튼을 누르세요!</p>
+        
+        <div class="target">문제: 점 <span id="coord" style="color:#2563eb;">(1, 2)</span> 를 찾으세요!</div>
+
+        <div class="grid">
+            <button onclick="check('(0, 0)')">(0, 0)</button>
+            <button onclick="check('(1, 2)')">(1, 2)</button>
+            <button onclick="check('(2, 1)')">(2, 1)</button>
+        </div>
+
+        <p id="result" style="font-weight:bold; height:24px;"></p>
+
+        <a href="index.html" class="back-btn">← 메인 화면으로 돌아가기</a>
+    </div>
+
+    <script>
+        function check(selected) {
+            const resultEl = document.getElementById('result');
+            if (selected === '(1, 2)') {
+                resultEl.innerText = "🎉 정답입니다!";
+                resultEl.style.color = "green";
+            } else {
+                resultEl.innerText = "❌ 다시 시도해보세요!";
+                resultEl.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
