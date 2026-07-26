@@ -167,7 +167,8 @@
         let level = 1;      // 1 ~ 10단계
         let stage = 1;      // 1 ~ 3스테이지
         let lives = 3;
-        let timeLeft = 15;
+        let TOTAL_TIME = 20; // 제한시간 20초로 수정
+        let timeLeft = TOTAL_TIME;
         let timerInterval = null;
         let currentProblem = {};
         let currentRankTab = "덧셈";
@@ -271,10 +272,10 @@
             nextQuestion();
         }
 
-        // 4. 난수 생성 및 문제 출제 (범위 증가 폭 1로 조정 반영)
+        // 4. 난수 생성 및 문제 출제 (범위 및 정수 조건 철저 검증)
         function generateProblem() {
-            // N단계일 때 범위: 1 ~ (N + 4) (1단계는 1~5, 2단계는 1~6...)
-            const range = level + 4; 
+            // N단계 최대 상한값: N + 4 (1단계 -> 5, 2단계 -> 6)
+            const maxVal = level + 4; 
             
             let op = currentMode;
             if (op === '랜덤') {
@@ -282,10 +283,13 @@
                 op = ops[Math.floor(Math.random() * ops.length)];
             }
 
-            // 기약분수 생성 함수 (분모는 2 이상으로 설정하여 기본적으로 분수 형태 보장)
+            // 지정한 최대 상한값(maxVal) 이하의 기약분수 생성
             function getRandomFrac() {
-                let den = Math.floor(Math.random() * (range - 1)) + 2; // 분모: 2 ~ range
-                let num = Math.floor(Math.random() * range) + 1;       // 분자: 1 ~ range
+                // 분모: 2 ~ maxVal
+                let den = Math.floor(Math.random() * (maxVal - 1)) + 2; 
+                // 분자: 1 ~ maxVal
+                let num = Math.floor(Math.random() * maxVal) + 1;       
+                
                 let g = gcd(num, den);
                 return { num: num / g, den: den / g };
             }
@@ -362,10 +366,10 @@
             startTimer();
         }
 
-        // 6. 타이머 동작
+        // 6. 타이머 동작 (20초)
         function startTimer() {
             clearInterval(timerInterval);
-            timeLeft = 15;
+            timeLeft = TOTAL_TIME;
             updateTimerBar();
 
             timerInterval = setInterval(() => {
@@ -381,7 +385,7 @@
 
         function updateTimerBar() {
             const bar = document.getElementById("timer-bar");
-            const percentage = (timeLeft / 15) * 100;
+            const percentage = (timeLeft / TOTAL_TIME) * 100;
             bar.style.width = `${Math.max(0, percentage)}%`;
             bar.style.backgroundColor = percentage < 30 ? "#ef4444" : "#2563eb";
         }
